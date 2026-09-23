@@ -1,61 +1,61 @@
-// Show one page and hide the others, then highlight the matching nav link
-function showPage(pageId) {
-    const pages = document.querySelectorAll(".page");
-    const links = document.querySelectorAll(".nav-links a");
+// The pages in the site. The menu is built from this list, so a new page only needs adding here.
+const pages = [
+    { id: "home",        file: "index.html",       label: "Home",        tooltip: "Energy use overview" },
+    { id: "televisions", file: "televisions.html", label: "Televisions", tooltip: "Charts on TV energy use" },
+    { id: "about",       file: "about.html",       label: "About Us",    tooltip: "Who we are" }
+];
 
-    // Fall back to home if the page id is not valid
-    if (!document.getElementById(pageId)) {
-        pageId = "home";
-    }
+// Each HTML file says which page it is with <body data-page="...">
+const currentPage = document.body.dataset.page;
 
+// Build the top navigation menu and highlight the current page
+function buildNav() {
+    let links = "";
     pages.forEach(function (page) {
-        page.classList.toggle("active", page.id === pageId);
+        const activeClass = page.id === currentPage ? "active" : "";
+        links += '<li><a href="' + page.file + '" class="' + activeClass + '" ' +
+                 'data-tooltip="' + page.tooltip + '">' + page.label + '</a></li>';
     });
 
-    links.forEach(function (link) {
-        link.classList.toggle("active", link.dataset.page === pageId);
-    });
-
-    // Update the browser tab title so the user knows where they are
-    const heading = document.querySelector("#" + pageId + " h1");
-    document.title = "PowerWise | " + heading.textContent;
+    document.getElementById("site-header").innerHTML =
+        '<nav class="navbar">' +
+            '<a href="index.html" class="logo" data-tooltip="Back to Home">' +
+                '<img src="images/PowerIcon.png" alt="Power logo">' +
+                '<span>PowerWise</span>' +
+            '</a>' +
+            '<ul class="nav-links">' + links + '</ul>' +
+        '</nav>';
 }
 
-// Nav links and the logo all carry a data-page attribute
-document.querySelectorAll("[data-page]").forEach(function (link) {
-    link.addEventListener("click", function (event) {
-        event.preventDefault();
-        const pageId = link.dataset.page;
-        history.pushState(null, "", "#" + pageId);
-        showPage(pageId);
-    });
-});
-
-// Support the browser back/forward buttons
-window.addEventListener("popstate", function () {
-    showPage(location.hash.substring(1));
-});
+// Build the footer (same on every page)
+function buildFooter() {
+    const year = new Date().getFullYear();
+    document.getElementById("site-footer").innerHTML =
+        '<p>&copy; ' + year + ' Stefani Lee Shi Huey &middot; COS30045 Data Visualisation</p>' +
+        '<p class="genai">GenAI acknowledgement: code and placeholder content were generated with ' +
+        'the assistance of AI tools and reviewed by the author.</p>';
+}
 
 // Chart view tabs: switch between two versions of the same chart (e.g. pie / bar)
-document.querySelectorAll(".chart-tabs .tab").forEach(function (tab) {
-    tab.addEventListener("click", function () {
-        const chart = tab.closest(".chart");   // only change the chart this tab belongs to
-        const view = tab.dataset.view;
+function setUpChartTabs() {
+    document.querySelectorAll(".chart-tabs .tab").forEach(function (tab) {
+        tab.addEventListener("click", function () {
+            const chart = tab.closest(".chart");   // only change the chart this tab belongs to
+            const view = tab.dataset.view;
 
-        chart.querySelectorAll(".tab").forEach(function (t) {
-            const isActive = t.dataset.view === view;
-            t.classList.toggle("active", isActive);
-            t.setAttribute("aria-selected", isActive);
-        });
+            chart.querySelectorAll(".tab").forEach(function (t) {
+                const isActive = t.dataset.view === view;
+                t.classList.toggle("active", isActive);
+                t.setAttribute("aria-selected", isActive);
+            });
 
-        chart.querySelectorAll(".chart-view").forEach(function (img) {
-            img.classList.toggle("active", img.dataset.view === view);
+            chart.querySelectorAll(".chart-view").forEach(function (img) {
+                img.classList.toggle("active", img.dataset.view === view);
+            });
         });
     });
-});
+}
 
-// Footer year
-document.getElementById("year").textContent = new Date().getFullYear();
-
-// Show the correct page on first load (e.g. if the URL has #televisions)
-showPage(location.hash.substring(1));
+buildNav();
+buildFooter();
+setUpChartTabs();

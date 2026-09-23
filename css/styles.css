@@ -95,14 +95,6 @@ main {
     padding: 32px 20px;
 }
 
-.page {
-    display: none;
-}
-
-.page.active {
-    display: block;
-}
-
 h1 {
     color: var(--brown);
     margin-bottom: 12px;
