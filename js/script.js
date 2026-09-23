@@ -36,6 +36,24 @@ window.addEventListener("popstate", function () {
     showPage(location.hash.substring(1));
 });
 
+// Chart view tabs: switch between two versions of the same chart (e.g. pie / bar)
+document.querySelectorAll(".chart-tabs .tab").forEach(function (tab) {
+    tab.addEventListener("click", function () {
+        const chart = tab.closest(".chart");   // only change the chart this tab belongs to
+        const view = tab.dataset.view;
+
+        chart.querySelectorAll(".tab").forEach(function (t) {
+            const isActive = t.dataset.view === view;
+            t.classList.toggle("active", isActive);
+            t.setAttribute("aria-selected", isActive);
+        });
+
+        chart.querySelectorAll(".chart-view").forEach(function (img) {
+            img.classList.toggle("active", img.dataset.view === view);
+        });
+    });
+});
+
 // Footer year
 document.getElementById("year").textContent = new Date().getFullYear();
 
